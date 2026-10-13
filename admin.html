@@ -45,12 +45,12 @@
                     <h2 class="text-xl font-bold text-gray-800">Input Suara (1 Kotak Suara)</h2>
                     <p class="text-xs text-gray-500 mt-0.5">Tekan tombol paslon setiap kali surat suara dibacakan (*Real-time Tally*)</p>
                 </div>
-                <span class="text-xs bg-gray-100 text-gray-600 font-bold px-3 py-1 rounded-lg">Total Suara: <span id="totalSuaraText" class="text-blue-600">0</span></span>
+                <span class="text-xs bg-gray-100 text-gray-600 font-bold px-3 py-1 rounded-lg">Total Suara Masuk: <span id="totalSuaraText" class="text-blue-600">0</span></span>
             </div>
 
             <!-- Grid Tombol Tap Paslon -->
             <div id="tallyGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                <!-- Disi secara dinamis dari JavaScript -->
+                <!-- Diisi secara dinamis dari JavaScript -->
             </div>
 
             <!-- Input Suara Tidak Sah & Batch Manual -->
@@ -65,7 +65,7 @@
                 </button>
             </div>
 
-            <!-- Form Batch Input (Hidden by default) -->
+            <!-- Form Batch Input -->
             <div id="batchInputContainer" class="hidden mt-6 p-4 bg-gray-50 rounded-xl border border-gray-200">
                 <h3 class="text-sm font-bold text-gray-700 mb-3">Input Direct/Batch Suara Akhir:</h3>
                 <div id="batchFields" class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4"></div>
@@ -73,7 +73,7 @@
             </div>
         </section>
 
-        <!-- SECTION 2: KHUSUS SUPER ADMIN (Dinamis Tambah/Hapus Paslon & Pengaturan) -->
+        <!-- SECTION 2: KHUSUS SUPER ADMIN -->
         <section id="superAdminPanel" class="hidden space-y-8">
 
             <!-- Kelola Paslon -->
@@ -81,28 +81,28 @@
                 <div class="flex justify-between items-center mb-6">
                     <div>
                         <h2 class="text-xl font-bold text-gray-800">Kelola Paslon & Profil</h2>
-                        <p class="text-xs text-gray-500 mt-0.5">Tambah, hapus, atau ubah tautan foto dan nama kandidat</p>
+                        <p class="text-xs text-gray-500 mt-0.5">Tambah atau hapus kandidat pasangan calon</p>
                     </div>
                     <button id="btnOpenAddPaslon" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition">+ Tambah Paslon</button>
                 </div>
 
-                <!-- Form Tambah Paslon (Modal/Collapsible) -->
+                <!-- Form Tambah Paslon -->
                 <div id="addPaslonForm" class="hidden mb-6 p-4 bg-blue-50 rounded-xl border border-blue-200 space-y-3">
                     <h3 class="font-bold text-sm text-blue-800">Form Tambah Paslon Baru</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                        <input type="text" id="newNamaKetua" placeholder="Nama Ketua" class="p-2.5 border rounded-lg">
-                        <input type="text" id="newNamaWakil" placeholder="Nama Wakil" class="p-2.5 border rounded-lg">
-                        <input type="url" id="newFotoKetua" placeholder="Link URL Foto Ketua (https://...)" class="p-2.5 border rounded-lg">
-                        <input type="url" id="newFotoWakil" placeholder="Link URL Foto Wakil (https://...)" class="p-2.5 border rounded-lg">
+                        <input type="text" id="newNamaKetua" placeholder="Nama Ketua" class="p-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        <input type="text" id="newNamaWakil" placeholder="Nama Wakil" class="p-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        <input type="url" id="newFotoKetua" placeholder="Link URL Foto Ketua (Opsional)" class="p-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        <input type="url" id="newFotoWakil" placeholder="Link URL Foto Wakil (Opsional)" class="p-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
                     </div>
                     <div class="flex justify-end space-x-2">
-                        <button id="btnCancelPaslon" class="px-3 py-1.5 bg-gray-300 text-xs font-bold rounded-lg">Batal</button>
-                        <button id="btnSaveNewPaslon" class="px-4 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-lg">Simpan Paslon</button>
+                        <button id="btnCancelPaslon" class="px-3 py-1.5 bg-gray-300 hover:bg-gray-400 text-xs font-bold rounded-lg transition">Batal</button>
+                        <button id="btnSaveNewPaslon" class="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition">Simpan Paslon</button>
                     </div>
                 </div>
 
-                <!-- Lista Paslon -->
-                <div id="adminPaslonList" class="space-y-4"></div>
+                <!-- Daftar Paslon yang Ada -->
+                <div id="adminPaslonList" class="space-y-3"></div>
             </div>
 
             <!-- Pengaturan Pemilihan & Reset -->
@@ -127,12 +127,12 @@
                     </div>
                 </div>
 
-                <!-- Zona Resiko (Reset) & Cetak Laporan -->
+                <!-- Cetak Laporan & Zona Bahaya -->
                 <div class="flex flex-col justify-between">
                     <div>
                         <h2 class="text-lg font-bold text-gray-800 mb-3">Laporan & Pengesahan</h2>
-                        <p class="text-xs text-gray-500 mb-4">Cetak Lembar Berita Acara resmi untuk ditandatangani panitia, pembina, dan saksi.</p>
-                        <button onclick="window.print()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-sm transition mb-6 flex items-center justify-center space-x-2">
+                        <p class="text-xs text-gray-500 mb-4">Cetak Lembar Berita Acara resmi untuk ditandatangani panitia dan saksi.</p>
+                        <button onclick="window.print()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-sm transition mb-6 flex items-center justify-center space-x-2 shadow">
                             <span>🖨️ Cetak Berita Acara (PDF)</span>
                         </button>
                     </div>
@@ -150,18 +150,16 @@
 
     </main>
 
-    <!-- SECTION BERITA ACARA LAYOUT (Hanya muncul saat dicetak / print) -->
+    <!-- LAYOUT PRINT BERITA ACARA -->
     <div class="hidden print-only p-8 max-w-4xl mx-auto bg-white text-black">
-        <!-- Kop Surat -->
         <div class="text-center border-b-2 border-black pb-4 mb-6">
             <h2 id="printSekolah" class="text-xl font-bold uppercase">SMA NEGERI / OSIS</h2>
             <h1 id="printJudul" class="text-2xl font-black uppercase mt-1">BERITA ACARA HASIL PERHITUNGAN SUARA</h1>
             <p class="text-xs mt-1">Pemilihan Ketua dan Wakil Ketua OSIS - Tahun 2026</p>
         </div>
 
-        <p class="text-sm mb-4">Pada hari ini, tanggal <span id="printTanggal"></span>, telah dilaksanakan perhitungan suara ulang / cepat (*Quick Count*) dengan hasil perolehan sebagai berikut:</p>
+        <p class="text-sm mb-4">Pada hari ini, tanggal <span id="printTanggal"></span>, telah dilaksanakan perhitungan suara (*Quick Count*) dengan hasil perolehan sebagai berikut:</p>
 
-        <!-- Tabel Perolehan -->
         <table class="w-full border-collapse border border-black text-sm mb-6">
             <thead>
                 <tr class="bg-gray-100">
@@ -171,9 +169,7 @@
                     <th class="border border-black p-2">Persentase (%)</th>
                 </tr>
             </thead>
-            <tbody id="printTabelBody">
-                <!-- Diisi via JavaScript -->
-            </tbody>
+            <tbody id="printTabelBody"></tbody>
             <tfoot>
                 <tr class="font-bold bg-gray-50">
                     <td colspan="2" class="border border-black p-2 text-right">Total Suara Tidak Sah / Batal:</td>
@@ -188,7 +184,6 @@
             </tfoot>
         </table>
 
-        <!-- Kolom Tanda Tangan -->
         <div class="mt-12 grid grid-cols-3 gap-4 text-center text-xs">
             <div>
                 <p>Ketua Panitia OSIS</p>
@@ -212,13 +207,12 @@
     <script type="module">
         import { db, ref, onValue, set, runTransaction, remove } from './app.js';
 
-        // Autentikasi Cek
+        // Check Login Sesi
         const currentUser = JSON.parse(localStorage.getItem('currentUser'));
         if (!currentUser) {
             window.location.href = 'login.html';
         }
 
-        // Tampilkan Identitas Usar
         document.getElementById('welcomeUser').innerText = `User: ${currentUser.username}`;
         const roleBadge = document.getElementById('roleBadge');
         roleBadge.innerText = currentUser.role;
@@ -235,7 +229,6 @@
             window.location.href = 'login.html';
         });
 
-        // Elements
         const tallyGrid = document.getElementById('tallyGrid');
         const alertBox = document.getElementById('statusAlert');
         let currentPaslonData = {};
@@ -247,7 +240,30 @@
             setTimeout(() => { alertBox.classList.add('hidden'); }, 3000);
         }
 
-        // Realtime Listener
+        // DAFTARKAN FUNGSI KE WINDOW GLOBAL AGAR BISA DIPANGGUL DARI HTML
+        window.addVote = async (key) => {
+            try {
+                const voteRef = ref(db, `paslon/${key}/suara`);
+                await runTransaction(voteRef, (curr) => (curr || 0) + 1);
+                showAlert("Suara berhasil ditambahkan!");
+            } catch (err) {
+                showAlert("Gagal menambah suara!", false);
+            }
+        };
+
+        window.deletePaslon = async (key) => {
+            if (confirm("Apakah Anda yakin ingin menghapus paslon ini? Data perolehan suaranya juga akan terhapus.")) {
+                try {
+                    await remove(ref(db, `paslon/${key}`));
+                    showAlert("Paslon berhasil dihapus!");
+                } catch (err) {
+                    console.error("Gagal menghapus:", err);
+                    showAlert("Gagal menghapus paslon dari database.", false);
+                }
+            }
+        };
+
+        // Realtime Listener Firebase
         const mainRef = ref(db);
         onValue(mainRef, (snapshot) => {
             const data = snapshot.val() || {};
@@ -258,13 +274,11 @@
             renderTallyButtons(currentPaslonData);
             document.getElementById('badgeTidakSah').innerText = suaraTidakSah;
 
-            // Hitung Total
             let totalSah = 0;
             Object.values(currentPaslonData).forEach(p => totalSah += (p.suara || 0));
             const totalMasuk = totalSah + suaraTidakSah;
             document.getElementById('totalSuaraText').innerText = totalMasuk;
 
-            // Render Panel Super Admin jika ada
             if (isSuperAdmin) {
                 renderAdminPaslonList(currentPaslonData);
                 document.getElementById('settingJudul').value = currentSettings.judul || '';
@@ -272,14 +286,18 @@
                 document.getElementById('settingDpt').value = currentSettings.total_dpt || 500;
             }
 
-            // Render Tampilan Print Berita Acara
             renderPrintDocument(currentPaslonData, suaraTidakSah, totalMasuk);
         });
 
-        // 1. Render Tally Grid (Input +1)
+        // 1. Render Tombol Tap Input Suara
         function renderTallyButtons(paslonData) {
             tallyGrid.innerHTML = '';
-            Object.keys(paslonData).forEach(key => {
+            const keys = Object.keys(paslonData);
+            if (keys.length === 0) {
+                tallyGrid.innerHTML = `<p class="text-sm text-gray-400 col-span-full text-center py-4">Belum ada paslon. Tambahkan dari panel Super Admin di bawah.</p>`;
+                return;
+            }
+            keys.forEach(key => {
                 const paslon = paslonData[key];
                 const card = document.createElement('div');
                 card.className = "bg-blue-50 border-2 border-blue-200 hover:border-blue-500 rounded-xl p-4 flex flex-col justify-between shadow-sm transition";
@@ -290,7 +308,7 @@
                     </div>
                     <div class="flex items-center justify-between">
                         <span class="text-2xl font-black text-blue-700">${paslon.suara || 0} <span class="text-xs text-gray-500 font-normal">Suara</span></span>
-                        <button onclick="addVote('${key}')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-sm shadow active:scale-95 transition">
+                        <button onclick="window.addVote('${key}')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-sm shadow active:scale-95 transition">
                             +1 Suara
                         </button>
                     </div>
@@ -299,21 +317,14 @@
             });
         }
 
-        // Tambah 1 Suara Paslon
-        window.addVote = async (key) => {
-            const voteRef = ref(db, `paslon/${key}/suara`);
-            await runTransaction(voteRef, (curr) => (curr || 0) + 1);
-            showAlert("Suara berhasil ditambahkan!");
-        };
-
-        // Tambah Suara Tidak Sah
+        // Suara Tidak Sah
         document.getElementById('btnAddTidakSah').addEventListener('click', async () => {
             const tsRef = ref(db, 'suara_tidak_sah');
             await runTransaction(tsRef, (curr) => (curr || 0) + 1);
             showAlert("Suara tidak sah ditambahkan!");
         });
 
-        // 2. Fitur Batch Input
+        // Batch Input
         const btnToggleBatch = document.getElementById('btnToggleBatch');
         const batchContainer = document.getElementById('batchInputContainer');
         btnToggleBatch.addEventListener('click', () => {
@@ -342,89 +353,90 @@
             batchContainer.classList.add('hidden');
         });
 
-        // 3. Super Admin Functions
-        if (isSuperAdmin) {
-            // Render List Kelola Paslon
-            function renderAdminPaslonList(paslonData) {
-                const list = document.getElementById('adminPaslonList');
-                list.innerHTML = '';
-                Object.keys(paslonData).forEach(key => {
-                    const p = paslonData[key];
-                    list.innerHTML += `
-                        <div class="p-3 border rounded-xl flex justify-between items-center bg-gray-50 text-xs md:text-sm">
-                            <div>
-                                <span class="font-bold text-blue-600">No. ${p.no_urut}</span>: 
-                                <span class="font-semibold">${p.nama_ketua} & ${p.nama_wakil}</span>
-                            </div>
-                            <button onclick="deletePaslon('${key}')" class="text-red-600 hover:text-red-800 font-bold bg-red-50 px-2.5 py-1 rounded-lg border border-red-200">Hapus</button>
-                        </div>
-                    `;
-                });
+        // 2. Fitur Super Admin (Render & Hapus Paslon)
+        function renderAdminPaslonList(paslonData) {
+            const list = document.getElementById('adminPaslonList');
+            list.innerHTML = '';
+            const keys = Object.keys(paslonData);
+            if (keys.length === 0) {
+                list.innerHTML = `<p class="text-xs text-gray-400 italic">Belum ada daftar paslon.</p>`;
+                return;
             }
-
-            // Tambah Paslon
-            document.getElementById('btnOpenAddPaslon').addEventListener('click', () => {
-                document.getElementById('addPaslonForm').classList.remove('hidden');
-            });
-            document.getElementById('btnCancelPaslon').addEventListener('click', () => {
-                document.getElementById('addPaslonForm').classList.add('hidden');
-            });
-
-            document.getElementById('btnSaveNewPaslon').addEventListener('click', async () => {
-                const ketua = document.getElementById('newNamaKetua').value.trim();
-                const wakil = document.getElementById('newNamaWakil').value.trim();
-                const fk = document.getElementById('newFotoKetua').value.trim();
-                const fw = document.getElementById('newFotoWakil').value.trim();
-
-                if (!ketua || !wakil) return showAlert("Nama Ketua & Wakil wajib diisi!", false);
-
-                const count = Object.keys(currentPaslonData).length + 1;
-                const newKey = `paslon_${Date.now()}`;
-
-                await set(ref(db, `paslon/${newKey}`), {
-                    no_urut: count,
-                    nama_ketua: ketua,
-                    nama_wakil: wakil,
-                    foto_ketua: fk || 'assets/logo-sekolah.png',
-                    foto_wakil: fw || 'assets/logo-osis.png',
-                    suara: 0
-                });
-
-                showAlert("Paslon baru berhasil ditambahkan!");
-                document.getElementById('addPaslonForm').classList.add('hidden');
-            });
-
-            // Hapus Paslon
-            window.deletePaslon = async (key) => {
-                if (confirm("Apakah Anda yakin ingin menghapus paslon ini?")) {
-                    await remove(ref(db, `paslon/${key}`));
-                    showAlert("Paslon berhasil dihapus.");
-                }
-            };
-
-            // Simpan Settings
-            document.getElementById('btnSaveSettings').addEventListener('click', async () => {
-                await set(ref(db, 'settings'), {
-                    judul: document.getElementById('settingJudul').value,
-                    nama_sekolah: document.getElementById('settingSekolah').value,
-                    total_dpt: parseInt(document.getElementById('settingDpt').value) || 500
-                });
-                showAlert("Pengaturan berhasil disimpan!");
-            });
-
-            // Reset Suara
-            document.getElementById('btnResetSuara').addEventListener('click', async () => {
-                if (confirm("PERINGATAN! Semua perolehan suara akan dikembalikan ke 0. Lanjutkan?")) {
-                    Object.keys(currentPaslonData).forEach(async (key) => {
-                        await set(ref(db, `paslon/${key}/suara`), 0);
-                    });
-                    await set(ref(db, 'suara_tidak_sah'), 0);
-                    showAlert("Seluruh suara berhasil di-reset!");
-                }
+            keys.forEach(key => {
+                const p = paslonData[key];
+                list.innerHTML += `
+                    <div class="p-3 border rounded-xl flex justify-between items-center bg-gray-50 text-xs md:text-sm">
+                        <div>
+                            <span class="font-bold text-blue-600">No. ${p.no_urut}</span>: 
+                            <span class="font-semibold text-gray-800">${p.nama_ketua} & ${p.nama_wakil}</span>
+                            <span class="text-xs text-gray-400 ml-2">(${p.suara || 0} suara)</span>
+                        </div>
+                        <button onclick="window.deletePaslon('${key}')" class="text-red-600 hover:text-red-800 font-bold bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg border border-red-200 transition">
+                            🗑️ Hapus
+                        </button>
+                    </div>
+                `;
             });
         }
 
-        // Render Lembar Berita Acara (Print)
+        // Tambah Paslon Baru
+        document.getElementById('btnOpenAddPaslon').addEventListener('click', () => {
+            document.getElementById('addPaslonForm').classList.remove('hidden');
+        });
+        document.getElementById('btnCancelPaslon').addEventListener('click', () => {
+            document.getElementById('addPaslonForm').classList.add('hidden');
+        });
+
+        document.getElementById('btnSaveNewPaslon').addEventListener('click', async () => {
+            const ketua = document.getElementById('newNamaKetua').value.trim();
+            const wakil = document.getElementById('newNamaWakil').value.trim();
+            const fk = document.getElementById('newFotoKetua').value.trim();
+            const fw = document.getElementById('newFotoWakil').value.trim();
+
+            if (!ketua || !wakil) return showAlert("Nama Ketua & Wakil wajib diisi!", false);
+
+            const count = Object.keys(currentPaslonData).length + 1;
+            const newKey = `paslon_${Date.now()}`;
+
+            await set(ref(db, `paslon/${newKey}`), {
+                no_urut: count,
+                nama_ketua: ketua,
+                nama_wakil: wakil,
+                foto_ketua: fk || 'assets/logo-sekolah.png',
+                foto_wakil: fw || 'assets/logo-osis.png',
+                suara: 0
+            });
+
+            showAlert("Paslon baru berhasil ditambahkan!");
+            document.getElementById('newNamaKetua').value = '';
+            document.getElementById('newNamaWakil').value = '';
+            document.getElementById('newFotoKetua').value = '';
+            document.getElementById('newFotoWakil').value = '';
+            document.getElementById('addPaslonForm').classList.add('hidden');
+        });
+
+        // Simpan Settings
+        document.getElementById('btnSaveSettings').addEventListener('click', async () => {
+            await set(ref(db, 'settings'), {
+                judul: document.getElementById('settingJudul').value,
+                nama_sekolah: document.getElementById('settingSekolah').value,
+                total_dpt: parseInt(document.getElementById('settingDpt').value) || 500
+            });
+            showAlert("Pengaturan berhasil disimpan!");
+        });
+
+        // Reset Suara ke 0
+        document.getElementById('btnResetSuara').addEventListener('click', async () => {
+            if (confirm("PERINGATAN! Semua perolehan suara akan dikembalikan ke 0. Lanjutkan?")) {
+                Object.keys(currentPaslonData).forEach(async (key) => {
+                    await set(ref(db, `paslon/${key}/suara`), 0);
+                });
+                await set(ref(db, 'suara_tidak_sah'), 0);
+                showAlert("Seluruh suara berhasil di-reset!");
+            }
+        });
+
+        // Render Berita Acara
         function renderPrintDocument(paslonData, tidakSah, total) {
             document.getElementById('printSekolah').innerText = currentSettings.nama_sekolah || 'SMA NEGERI / OSIS';
             document.getElementById('printJudul').innerText = currentSettings.judul || 'BERITA ACARA HASIL PERHITUNGAN SUARA';
