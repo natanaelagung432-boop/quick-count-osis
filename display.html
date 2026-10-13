@@ -56,7 +56,7 @@
 
         <!-- Grid Cards Paslon (Dinamis dari Firebase) -->
         <div id="paslonContainer" class="w-full flex flex-wrap items-center justify-center gap-6 md:gap-8">
-            <!-- Kartu Paslon akan dirender secara dinamis melalui JavaScript -->
+            <!-- Kartu Paslon dirender via JS -->
         </div>
 
         <!-- Section Grafik Perolehan Suara & Ringkasan -->
@@ -103,7 +103,6 @@
         const paslonContainer = document.getElementById('paslonContainer');
         let voteChart = null;
 
-        // Inisialisasi Chart.js
         function initChart() {
             const ctx = document.getElementById('voteChart').getContext('2d');
             voteChart = new Chart(ctx, {
@@ -150,6 +149,10 @@
             if (settings.judul) document.getElementById('judulPemilihan').innerText = settings.judul;
             if (settings.nama_sekolah) document.getElementById('namaSekolah').innerText = settings.nama_sekolah;
 
+            // Update URL Logo jika diset di settings Firebase, jika tidak pakai file lokal di assets/
+            if (settings.url_logo_sekolah) document.getElementById('displayLogoSekolah').src = settings.url_logo_sekolah;
+            if (settings.url_logo_osis) document.getElementById('displayLogoOsis').src = settings.url_logo_osis;
+
             // 2. Hitung Total Suara
             let totalSuaraSah = 0;
             Object.values(paslonData).forEach(p => totalSuaraSah += (p.suara || 0));
@@ -170,14 +173,11 @@
                 labelsChart.push(`Paslon 0${noUrut}`);
                 dataChart.push(suara);
 
-                // Elemen Kartu Paslon (Frame Biru)
                 const card = document.createElement('div');
                 card.className = "w-full sm:w-80 md:w-96 bg-blue-500 rounded-3xl p-5 md:p-6 shadow-xl text-white flex flex-col justify-between transform hover:scale-105 transition duration-300 relative border-4 border-blue-400";
 
                 card.innerHTML = `
-                    <!-- Wadah Dua Foto Calon -->
                     <div class="grid grid-cols-2 gap-3 md:gap-4 mb-4">
-                        <!-- Foto Ketua -->
                         <div class="bg-amber-400 rounded-2xl h-44 sm:h-48 md:h-52 overflow-hidden shadow-inner flex items-center justify-center p-1 border-2 border-amber-300">
                             <img src="${paslon.foto_ketua || 'assets/logo-sekolah.png'}" 
                                  alt="Foto Ketua" 
@@ -185,7 +185,6 @@
                                  onerror="this.src='assets/logo-sekolah.png'">
                         </div>
 
-                        <!-- Foto Wakil -->
                         <div class="bg-amber-400 rounded-2xl h-44 sm:h-48 md:h-52 overflow-hidden shadow-inner flex items-center justify-center p-1 border-2 border-amber-300">
                             <img src="${paslon.foto_wakil || 'assets/logo-osis.png'}" 
                                  alt="Foto Wakil" 
@@ -194,20 +193,17 @@
                         </div>
                     </div>
 
-                    <!-- Nomor Urut Lingkaran -->
                     <div class="relative flex items-center justify-center my-2">
                         <div class="w-12 h-12 md:w-14 md:h-14 bg-amber-500 text-white font-extrabold text-xl md:text-2xl rounded-full border-4 border-white shadow-lg flex items-center justify-center z-10">
                             ${noUrut}
                         </div>
                     </div>
 
-                    <!-- Nama Ketua & Wakil -->
                     <div class="grid grid-cols-2 gap-2 text-center text-xs md:text-sm font-bold tracking-wide mt-1 pb-3 border-b border-blue-400">
                         <div class="truncate px-1">${paslon.nama_ketua || 'Nama Ketua'}</div>
                         <div class="truncate px-1">${paslon.nama_wakil || 'Nama Wakil'}</div>
                     </div>
 
-                    <!-- Perolehan Suara & Persentase -->
                     <div class="mt-4 text-center">
                         <div class="text-3xl md:text-4xl font-black tracking-wider text-amber-300">
                             ${suara} <span class="text-sm font-medium text-white">Suara</span>
@@ -228,7 +224,7 @@
                 voteChart.update();
             }
 
-            // 5. Update Stat Ringkasan
+            // 5. Update Ringkasan Stat
             document.getElementById('statDpt').innerText = totalDpt;
             document.getElementById('statMasuk').innerText = totalSuaraMasuk;
             document.getElementById('statTidakSah').innerText = suaraTidakSah;
