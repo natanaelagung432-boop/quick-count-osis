@@ -14,6 +14,7 @@
             .no-print { display: none !important; }
             .print-only { display: block !important; }
             body { background: white !important; color: black !important; }
+            @page { margin: 1.5cm; }
         }
     </style>
 </head>
@@ -191,54 +192,71 @@
 
     </main>
 
-    <!-- LAYOUT PRINT BERITA ACARA -->
+    <!-- LAYOUT PRINT BERITA ACARA (DENGAN LOGO SEKOLAH KIRI & OSIS KANAN) -->
     <div class="hidden print-only p-8 max-w-4xl mx-auto bg-white text-black">
-        <div class="text-center border-b-2 border-black pb-4 mb-6">
-            <h2 id="printSekolah" class="text-xl font-bold uppercase">SMA NEGERI / OSIS</h2>
-            <h1 id="printJudul" class="text-2xl font-black uppercase mt-1">BERITA ACARA HASIL PERHITUNGAN SUARA</h1>
-            <p class="text-xs mt-1">Pemilihan Ketua dan Wakil Ketua OSIS - Tahun 2026</p>
+        
+        <!-- Header Print Kop Berita Acara -->
+        <div class="flex items-center justify-between border-b-4 border-black pb-4 mb-6">
+            <!-- Logo Sekolah (Kiri) -->
+            <div class="w-20 h-20 flex items-center justify-center">
+                <img id="printLogoSekolah" src="assets/logo-sekolah.png" alt="Logo Sekolah" class="max-w-full max-h-full object-contain" onerror="this.onerror=null; this.src='assets/logo-sekolah.jpg';">
+            </div>
+
+            <!-- Teks Kop Surat (Tengah) -->
+            <div class="text-center flex-1 px-4">
+                <h2 id="printSekolah" class="text-xl font-black uppercase tracking-wide">SMP BRUDERAN PURWOREJO</h2>
+                <h1 id="printJudul" class="text-2xl font-black uppercase tracking-wider mt-1">BERITA ACARA HASIL PERHITUNGAN SUARA</h1>
+                <p class="text-xs font-semibold mt-1 uppercase tracking-widest">Pemilihan Ketua dan Wakil Ketua OSIS</p>
+            </div>
+
+            <!-- Logo OSIS (Kanan) -->
+            <div class="w-20 h-20 flex items-center justify-center">
+                <img id="printLogoOsis" src="assets/logo-osis.png" alt="Logo OSIS" class="max-w-full max-h-full object-contain" onerror="this.onerror=null; this.src='assets/logo-osis.jpg';">
+            </div>
         </div>
 
-        <p class="text-sm mb-4">Pada hari ini, tanggal <span id="printTanggal"></span>, telah dilaksanakan perhitungan suara (*Quick Count*) dengan hasil perolehan sebagai berikut:</p>
+        <p class="text-sm mb-4 leading-relaxed">Pada hari ini, tanggal <span id="printTanggal" class="font-bold"></span>, telah dilaksanakan perhitungan suara (*Quick Count*) secara digital dengan hasil perolehan sebagai berikut:</p>
 
-        <table class="w-full border-collapse border border-black text-sm mb-6">
+        <!-- Tabel Perolehan Suara -->
+        <table class="w-full border-collapse border-2 border-black text-sm mb-6">
             <thead>
-                <tr class="bg-gray-100">
-                    <th class="border border-black p-2">No</th>
-                    <th class="border border-black p-2 text-left">Nama Pasangan Calon</th>
-                    <th class="border border-black p-2">Jumlah Suara Sah</th>
-                    <th class="border border-black p-2">Persentase (%)</th>
+                <tr class="bg-gray-100 font-bold border-b-2 border-black">
+                    <th class="border border-black p-2.5 text-center w-12">No</th>
+                    <th class="border border-black p-2.5 text-left">Nama Pasangan Calon</th>
+                    <th class="border border-black p-2.5 text-center w-36">Jumlah Suara Sah</th>
+                    <th class="border border-black p-2.5 text-center w-32">Persentase (%)</th>
                 </tr>
             </thead>
             <tbody id="printTabelBody"></tbody>
             <tfoot>
-                <tr class="font-bold bg-gray-50">
-                    <td colspan="2" class="border border-black p-2 text-right">Total Suara Tidak Sah / Batal:</td>
-                    <td id="printTidakSah" class="border border-black p-2 text-center">0</td>
-                    <td class="border border-black p-2 text-center">-</td>
+                <tr class="font-bold bg-gray-50 border-t-2 border-black">
+                    <td colspan="2" class="border border-black p-2.5 text-right">Total Suara Tidak Sah / Batal:</td>
+                    <td id="printTidakSah" class="border border-black p-2.5 text-center font-bold">0</td>
+                    <td class="border border-black p-2.5 text-center text-gray-400">-</td>
                 </tr>
-                <tr class="font-bold bg-gray-200">
-                    <td colspan="2" class="border border-black p-2 text-right">TOTAL SUARA MASUK:</td>
-                    <td id="printTotalSuara" class="border border-black p-2 text-center">0</td>
-                    <td id="printProgressDpt" class="border border-black p-2 text-center">100%</td>
+                <tr class="font-bold bg-gray-200 border-t border-black">
+                    <td colspan="2" class="border border-black p-2.5 text-right">TOTAL SUARA MASUK:</td>
+                    <td id="printTotalSuara" class="border border-black p-2.5 text-center text-blue-900 font-extrabold">0</td>
+                    <td id="printProgressDpt" class="border border-black p-2.5 text-center font-bold">100%</td>
                 </tr>
             </tfoot>
         </table>
 
+        <!-- Kolom Tanda Tangan Pengesahan -->
         <div class="mt-12 grid grid-cols-3 gap-4 text-center text-xs">
             <div>
-                <p>Ketua Panitia OSIS</p>
-                <div class="h-16"></div>
+                <p class="font-semibold">Ketua Panitia Pemilihan</p>
+                <div class="h-20"></div>
                 <p class="font-bold underline">( .................................... )</p>
             </div>
             <div>
-                <p>Pembina OSIS</p>
-                <div class="h-16"></div>
+                <p class="font-semibold">Pembina OSIS</p>
+                <div class="h-20"></div>
                 <p class="font-bold underline">( .................................... )</p>
             </div>
             <div>
-                <p>Saksi Utama</p>
-                <div class="h-16"></div>
+                <p class="font-semibold">Saksi Utama</p>
+                <div class="h-20"></div>
                 <p class="font-bold underline">( .................................... )</p>
             </div>
         </div>
@@ -283,12 +301,20 @@
             setTimeout(() => { alertBox.classList.add('hidden'); }, 3000);
         }
 
-        // DAFTARKAN FUNGSI GLOBAL
+        // FUNGSI GLOBAL
         window.addVote = async (key) => {
-            if (isDptFull) {
-                showAlert("Gagal: Total suara sudah mencapai batas DPT!", false);
+            let totalSaatIni = 0;
+            Object.values(currentPaslonData).forEach(p => totalSaatIni += (p.suara || 0));
+            const suaraTidakSah = parseInt(document.getElementById('badgeTidakSah').innerText) || 0;
+            totalSaatIni += suaraTidakSah;
+
+            const limitDpt = currentSettings.total_dpt || 500;
+
+            if (totalSaatIni >= limitDpt) {
+                showAlert(`Gagal! Perolehan suara sudah mencapai batas maksimal DPT (${limitDpt}).`, false);
                 return;
             }
+
             try {
                 const voteRef = ref(db, `paslon/${key}/suara`);
                 await runTransaction(voteRef, (curr) => (curr || 0) + 1);
@@ -356,24 +382,20 @@
             Object.values(currentPaslonData).forEach(p => totalSah += (p.suara || 0));
             const totalMasuk = totalSah + suaraTidakSah;
 
-            // CEK APAKAH DPT SUDAH TERPENUHI
             isDptFull = totalMasuk >= maxDpt;
 
-            // Tampilkan / Sembunyikan Peringatan DPT Penuh
             if (isDptFull) {
                 dptBanner.classList.remove('hidden');
             } else {
                 dptBanner.classList.add('hidden');
             }
 
-            // Render Tombol & Kunci Jika Penuh
             renderTallyButtons(currentPaslonData, isDptFull);
             
             document.getElementById('badgeTidakSah').innerText = suaraTidakSah;
             document.getElementById('totalSuaraText').innerText = totalMasuk;
             document.getElementById('textDptLimit').innerText = maxDpt;
 
-            // Nonaktifkan Tombol Suara Tidak Sah jika DPT Penuh
             const btnTs = document.getElementById('btnAddTidakSah');
             btnTs.disabled = isDptFull;
 
@@ -387,7 +409,7 @@
             renderPrintDocument(currentPaslonData, suaraTidakSah, totalMasuk);
         });
 
-        // 1. Render Tombol Tap Input Suara dengan Penguncian DPT
+        // 1. Render Tombol Tap Input Suara
         function renderTallyButtons(paslonData, isFull) {
             tallyGrid.innerHTML = '';
             const keys = Object.keys(paslonData);
@@ -590,10 +612,15 @@
             }
         });
 
+        // RENDER BERITA ACARA CETAK / PRINT
         function renderPrintDocument(paslonData, tidakSah, total) {
-            document.getElementById('printSekolah').innerText = currentSettings.nama_sekolah || 'SMA NEGERI / OSIS';
+            document.getElementById('printSekolah').innerText = currentSettings.nama_sekolah || 'SMP BRUDERAN PURWOREJO';
             document.getElementById('printJudul').innerText = currentSettings.judul || 'BERITA ACARA HASIL PERHITUNGAN SUARA';
             document.getElementById('printTanggal').innerText = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+            // Update URL Logo jika diset di settings
+            if (currentSettings.url_logo_sekolah) document.getElementById('printLogoSekolah').src = currentSettings.url_logo_sekolah;
+            if (currentSettings.url_logo_osis) document.getElementById('printLogoOsis').src = currentSettings.url_logo_osis;
 
             const tbody = document.getElementById('printTabelBody');
             tbody.innerHTML = '';
@@ -603,10 +630,10 @@
                 const pct = total > 0 ? ((p.suara / total) * 100).toFixed(1) : 0;
                 tbody.innerHTML += `
                     <tr>
-                        <td class="border border-black p-2 text-center">${i++}</td>
-                        <td class="border border-black p-2 font-bold">${p.nama_ketua} & ${p.nama_wakil}</td>
-                        <td class="border border-black p-2 text-center">${p.suara || 0}</td>
-                        <td class="border border-black p-2 text-center">${pct}%</td>
+                        <td class="border border-black p-2.5 text-center">${i++}</td>
+                        <td class="border border-black p-2.5 font-bold">${p.nama_ketua} & ${p.nama_wakil}</td>
+                        <td class="border border-black p-2.5 text-center font-bold">${p.suara || 0}</td>
+                        <td class="border border-black p-2.5 text-center font-bold">${pct}%</td>
                     </tr>
                 `;
             });
