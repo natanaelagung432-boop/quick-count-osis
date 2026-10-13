@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Count Pemilihan Ketua & Wakil Ketua OSIS</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Family Montserrat & Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col justify-between items-center p-4">
+
+    <!-- Container Utama -->
+    <div class="w-full max-w-4xl flex flex-col items-center justify-center flex-grow py-8">
+        
+        <!-- Header Logo (Atas) -->
+        <div class="flex items-center justify-center space-x-6 md:space-x-12 mb-10 w-full">
+            <!-- Logo Sekolah -->
+            <div class="flex flex-col items-center justify-center w-28 h-16 md:w-36 md:h-20 bg-blue-500 rounded-full text-white font-semibold text-center shadow-md p-2 hover:scale-105 transition duration-300">
+                <img id="logoSekolah" src="assets/logo-sekolah.png" alt="Logo Sekolah" class="max-h-full max-w-full object-contain hidden" onerror="this.classList.add('hidden'); document.getElementById('placeholderSekolah').classList.remove('hidden');">
+                <div id="placeholderSekolah" class="flex flex-col items-center justify-center">
+                    <span class="text-xs md:text-sm font-bold tracking-wider">LOGO</span>
+                    <span class="text-xs md:text-sm font-bold tracking-wider">sklh</span>
+                </div>
+            </div>
+
+            <!-- Logo OSIS -->
+            <div class="flex flex-col items-center justify-center w-28 h-16 md:w-36 md:h-20 bg-blue-500 rounded-full text-white font-semibold text-center shadow-md p-2 hover:scale-105 transition duration-300">
+                <img id="logoOsis" src="assets/logo-osis.png" alt="Logo OSIS" class="max-h-full max-w-full object-contain hidden" onerror="this.classList.add('hidden'); document.getElementById('placeholderOsis').classList.remove('hidden');">
+                <div id="placeholderOsis" class="flex flex-col items-center justify-center">
+                    <span class="text-xs md:text-sm font-bold tracking-wider">LOGO</span>
+                    <span class="text-xs md:text-sm font-bold tracking-wider">osis</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Judul Utama (Tengah) -->
+        <div class="text-center my-6 px-4">
+            <h1 id="judulPemilihan" class="text-2xl md:text-4xl lg:text-5xl font-extrabold text-gray-800 tracking-wide leading-tight uppercase">
+                QUICK COUNT PEMILIHAN<br class="hidden sm:inline"> KETUA-WAKIL KETUA OSIS
+            </h1>
+            <p id="namaSekolah" class="mt-3 text-sm md:text-base font-semibold text-gray-500 tracking-widest uppercase">
+                -- PERHITUNGAN SUARA REAL-TIME --
+            </p>
+        </div>
+
+        <!-- Tombol Akses Utama (Bawah) -->
+        <div class="w-full max-w-sm flex flex-col space-y-4 mt-8 px-4">
+            <!-- Tombol LOGIN -->
+            <a href="login.html" 
+               class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold text-lg md:text-xl py-3.5 px-6 rounded-2xl shadow-lg hover:shadow-xl text-center transform active:scale-95 transition duration-200 uppercase tracking-wider block">
+                LOGIN
+            </a>
+
+            <!-- Tombol DISPLAY -->
+            <a href="display.html" 
+               class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold text-lg md:text-xl py-3.5 px-6 rounded-2xl shadow-lg hover:shadow-xl text-center transform active:scale-95 transition duration-200 uppercase tracking-wider block">
+                DISPLAY
+            </a>
+        </div>
+
+    </div>
+
+    <!-- Footer Status -->
+    <footer class="w-full text-center py-4 text-xs md:text-sm text-gray-400 font-medium">
+        &copy; 2026 Quick Count Pemilu OSIS. Powered by Firebase & GitHub Pages.
+    </footer>
+
+    <!-- Firebase Integration Script -->
+    <script type="module">
+        import { db, ref, onValue } from './app.js';
+
+        // Mendengarkan perubahan data judul & nama sekolah secara dinamis dari Firebase
+        try {
+            const settingsRef = ref(db, 'settings');
+            onValue(settingsRef, (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    if (data.judul) {
+                        document.getElementById('judulPemilihan').innerText = data.judul;
+                    }
+                    if (data.nama_sekolah) {
+                        document.getElementById('namaSekolah').innerText = data.nama_sekolah;
+                    }
+                }
+            });
+        } catch (e) {
+            console.log("Firebase belum diinisialisasi atau berjalan dalam mode offline.");
+        }
+
+        // Cek ketersediaan file logo
+        window.addEventListener('DOMContentLoaded', () => {
+            const imgSekolah = document.getElementById('logoSekolah');
+            const imgOsis = document.getElementById('logoOsis');
+
+            // Coba muat gambar jika ada
+            imgSekolah.classList.remove('hidden');
+            imgOsis.classList.remove('hidden');
+        });
+    </script>
+</body>
+</html>
