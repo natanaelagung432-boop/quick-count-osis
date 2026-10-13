@@ -73,7 +73,7 @@
             </div>
         </section>
 
-        <!-- SECTION 2: KHUSUS SUPER ADMIN (Kelola Paslon & Identitas) -->
+        <!-- SECTION 2: KHUSUS SUPER ADMIN -->
         <section id="superAdminPanel" class="hidden space-y-8">
 
             <!-- Kelola Paslon -->
@@ -120,12 +120,12 @@
                     <table class="w-full text-left text-sm text-gray-600">
                         <thead class="bg-gray-100 text-xs uppercase text-gray-700 font-bold border-b">
                             <tr>
-                                <th class="p-3 text-center">No</th>
+                                <th class="p-3 text-center w-12">No</th>
                                 <th class="p-3">Nama Ketua</th>
                                 <th class="p-3">Nama Wakil</th>
                                 <th class="p-3 text-center">Foto Ketua</th>
                                 <th class="p-3 text-center">Foto Wakil</th>
-                                <th class="p-3 text-center">Aksi</th>
+                                <th class="p-3 text-center w-40">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="adminPaslonTableBody" class="divide-y divide-gray-200 bg-white">
@@ -270,7 +270,7 @@
             setTimeout(() => { alertBox.classList.add('hidden'); }, 3000);
         }
 
-        // FUNGSI GLOBAL
+        // DAFTARKAN FUNGSI GLOBAL KE WINDOW
         window.addVote = async (key) => {
             try {
                 const voteRef = ref(db, `paslon/${key}/suara`);
@@ -293,7 +293,6 @@
             }
         };
 
-        // Fungsi Buka Form Edit Paslon
         window.editPaslon = (key) => {
             const p = currentPaslonData[key];
             if (!p) return;
@@ -309,7 +308,6 @@
             window.scrollTo({ top: document.getElementById('addPaslonForm').offsetTop - 100, behavior: 'smooth' });
         };
 
-        // Update / Unggah Foto
         window.updateFoto = async (key, tipe) => {
             const currentUrl = currentPaslonData[key]?.[tipe] || '';
             const newUrl = prompt(`Masukkan URL Foto ${tipe === 'foto_ketua' ? 'Ketua' : 'Wakil'} baru:`, currentUrl);
@@ -320,7 +318,6 @@
             }
         };
 
-        // Hapus Foto (Silang)
         window.removeFoto = async (key, tipe) => {
             if (confirm(`Hapus foto ${tipe === 'foto_ketua' ? 'Ketua' : 'Wakil'} ini?`)) {
                 const defaultFallback = tipe === 'foto_ketua' ? 'assets/logo-sekolah.png' : 'assets/logo-osis.png';
@@ -443,8 +440,8 @@
                         
                         <!-- Foto Ketua -->
                         <td class="p-3 text-center">
-                            <div class="flex items-center justify-center space-x-2">
-                                <img src="${fk}" alt="Foto Ketua" class="w-10 h-10 rounded-lg object-cover border" onerror="this.src='assets/logo-sekolah.png'">
+                            <div class="flex items-center justify-center space-x-1.5">
+                                <img src="${fk}" alt="Foto Ketua" class="w-9 h-9 rounded-lg object-cover border" onerror="this.src='assets/logo-sekolah.png'">
                                 <button onclick="window.updateFoto('${key}', 'foto_ketua')" title="Unggah / Ubah URL Foto" class="p-1 text-xs bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-md font-bold">📤</button>
                                 <button onclick="window.removeFoto('${key}', 'foto_ketua')" title="Hapus / Reset Foto" class="p-1 text-xs bg-red-100 text-red-700 hover:bg-red-200 rounded-md font-bold">❌</button>
                             </div>
@@ -452,20 +449,20 @@
 
                         <!-- Foto Wakil -->
                         <td class="p-3 text-center">
-                            <div class="flex items-center justify-center space-x-2">
-                                <img src="${fw}" alt="Foto Wakil" class="w-10 h-10 rounded-lg object-cover border" onerror="this.src='assets/logo-osis.png'">
+                            <div class="flex items-center justify-center space-x-1.5">
+                                <img src="${fw}" alt="Foto Wakil" class="w-9 h-9 rounded-lg object-cover border" onerror="this.src='assets/logo-osis.png'">
                                 <button onclick="window.updateFoto('${key}', 'foto_wakil')" title="Unggah / Ubah URL Foto" class="p-1 text-xs bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-md font-bold">📤</button>
                                 <button onclick="window.removeFoto('${key}', 'foto_wakil')" title="Hapus / Reset Foto" class="p-1 text-xs bg-red-100 text-red-700 hover:bg-red-200 rounded-md font-bold">❌</button>
                             </div>
                         </td>
 
-                        <!-- Tombol Edit & Hapus -->
+                        <!-- Tombol Edit & Hapus BERDAMPINGAN -->
                         <td class="p-3 text-center">
                             <div class="flex items-center justify-center space-x-2">
-                                <button onclick="window.editPaslon('${key}')" class="text-xs bg-amber-500 hover:bg-amber-600 text-white font-bold px-3 py-1.5 rounded-lg shadow transition">
+                                <button onclick="window.editPaslon('${key}')" class="text-xs bg-amber-500 hover:bg-amber-600 text-white font-bold px-2.5 py-1.5 rounded-lg shadow transition whitespace-nowrap">
                                     ✏️ Edit
                                 </button>
-                                <button onclick="window.deletePaslon('${key}')" class="text-xs bg-red-500 hover:bg-red-600 text-white font-bold px-3 py-1.5 rounded-lg shadow transition">
+                                <button onclick="window.deletePaslon('${key}')" class="text-xs bg-red-500 hover:bg-red-600 text-white font-bold px-2.5 py-1.5 rounded-lg shadow transition whitespace-nowrap">
                                     🗑️ Hapus
                                 </button>
                             </div>
@@ -495,7 +492,7 @@
             resetPaslonForm();
         });
 
-        // Simpan (Tambah Baru ATAU Update Edit)
+        // Simpan
         document.getElementById('btnSaveNewPaslon').addEventListener('click', async () => {
             const key = document.getElementById('editPaslonKey').value;
             const ketua = document.getElementById('newNamaKetua').value.trim();
@@ -506,14 +503,12 @@
             if (!ketua || !wakil) return showAlert("Nama Ketua & Wakil wajib diisi!", false);
 
             if (key) {
-                // UPDATE / EDIT PASLON
                 await set(ref(db, `paslon/${key}/nama_ketua`), ketua);
                 await set(ref(db, `paslon/${key}/nama_wakil`), wakil);
                 await set(ref(db, `paslon/${key}/foto_ketua`), fk || 'assets/logo-sekolah.png');
                 await set(ref(db, `paslon/${key}/foto_wakil`), fw || 'assets/logo-osis.png');
                 showAlert("Data paslon berhasil diperbarui!");
             } else {
-                // TAMBAH PASLON BARU
                 const count = Object.keys(currentPaslonData).length + 1;
                 const newKey = `paslon_${Date.now()}`;
 
@@ -531,7 +526,7 @@
             resetPaslonForm();
         });
 
-        // Simpan Settings
+        // Settings
         document.getElementById('btnSaveSettings').addEventListener('click', async () => {
             await set(ref(db, 'settings'), {
                 judul: document.getElementById('settingJudul').value,
@@ -541,7 +536,7 @@
             showAlert("Pengaturan berhasil disimpan!");
         });
 
-        // Reset Suara ke 0
+        // Reset Suara
         document.getElementById('btnResetSuara').addEventListener('click', async () => {
             if (confirm("PERINGATAN! Semua perolehan suara akan dikembalikan ke 0. Lanjutkan?")) {
                 Object.keys(currentPaslonData).forEach(async (key) => {
@@ -552,7 +547,7 @@
             }
         });
 
-        // Render Berita Acara
+        // Print Document
         function renderPrintDocument(paslonData, tidakSah, total) {
             document.getElementById('printSekolah').innerText = currentSettings.nama_sekolah || 'SMA NEGERI / OSIS';
             document.getElementById('printJudul').innerText = currentSettings.judul || 'BERITA ACARA HASIL PERHITUNGAN SUARA';
