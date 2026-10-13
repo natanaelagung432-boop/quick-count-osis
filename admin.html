@@ -73,36 +73,64 @@
             </div>
         </section>
 
-        <!-- SECTION 2: KHUSUS SUPER ADMIN -->
+        <!-- SECTION 2: KHUSUS SUPER ADMIN (Kelola Paslon & Identitas) -->
         <section id="superAdminPanel" class="hidden space-y-8">
 
             <!-- Kelola Paslon -->
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                 <div class="flex justify-between items-center mb-6">
                     <div>
-                        <h2 class="text-xl font-bold text-gray-800">Kelola Paslon & Profil</h2>
-                        <p class="text-xs text-gray-500 mt-0.5">Tambah atau hapus kandidat pasangan calon</p>
+                        <h2 class="text-xl font-bold text-gray-800">Kelola Paslon & Foto Candidate</h2>
+                        <p class="text-xs text-gray-500 mt-0.5">Tambah kandidat baru, kelola foto paslon, atau hapus pasangan calon</p>
                     </div>
-                    <button id="btnOpenAddPaslon" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition">+ Tambah Paslon</button>
+                    <button id="btnOpenAddPaslon" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition">+ Tambah Paslon Baru</button>
                 </div>
 
                 <!-- Form Tambah Paslon -->
                 <div id="addPaslonForm" class="hidden mb-6 p-4 bg-blue-50 rounded-xl border border-blue-200 space-y-3">
                     <h3 class="font-bold text-sm text-blue-800">Form Tambah Paslon Baru</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                        <input type="text" id="newNamaKetua" placeholder="Nama Ketua" class="p-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
-                        <input type="text" id="newNamaWakil" placeholder="Nama Wakil" class="p-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
-                        <input type="url" id="newFotoKetua" placeholder="Link URL Foto Ketua (Opsional)" class="p-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
-                        <input type="url" id="newFotoWakil" placeholder="Link URL Foto Wakil (Opsional)" class="p-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Nama Ketua:</label>
+                            <input type="text" id="newNamaKetua" placeholder="Contoh: Ahmad Rizky" class="w-full p-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Nama Wakil:</label>
+                            <input type="text" id="newNamaWakil" placeholder="Contoh: Siti Nurhaliza" class="w-full p-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">URL Foto Ketua (Opsional):</label>
+                            <input type="url" id="newFotoKetua" placeholder="https://... / assets/foto.jpg" class="w-full p-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">URL Foto Wakil (Opsional):</label>
+                            <input type="url" id="newFotoWakil" placeholder="https://... / assets/foto.jpg" class="w-full p-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white">
+                        </div>
                     </div>
-                    <div class="flex justify-end space-x-2">
+                    <div class="flex justify-end space-x-2 pt-2">
                         <button id="btnCancelPaslon" class="px-3 py-1.5 bg-gray-300 hover:bg-gray-400 text-xs font-bold rounded-lg transition">Batal</button>
                         <button id="btnSaveNewPaslon" class="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition">Simpan Paslon</button>
                     </div>
                 </div>
 
-                <!-- Daftar Paslon yang Ada -->
-                <div id="adminPaslonList" class="space-y-3"></div>
+                <!-- TABEL / LIST PASLON TERDAFTAR REAL-TIME -->
+                <div class="overflow-x-auto border rounded-xl">
+                    <table class="w-full text-left text-sm text-gray-600">
+                        <thead class="bg-gray-100 text-xs uppercase text-gray-700 font-bold border-b">
+                            <tr>
+                                <th class="p-3 text-center">No</th>
+                                <th class="p-3">Nama Ketua</th>
+                                <th class="p-3">Nama Wakil</th>
+                                <th class="p-3 text-center">Foto Ketua</th>
+                                <th class="p-3 text-center">Foto Wakil</th>
+                                <th class="p-3 text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminPaslonTableBody" class="divide-y divide-gray-200 bg-white">
+                            <!-- Diisi dinamis via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <!-- Pengaturan Pemilihan & Reset -->
@@ -240,7 +268,7 @@
             setTimeout(() => { alertBox.classList.add('hidden'); }, 3000);
         }
 
-        // DAFTARKAN FUNGSI KE WINDOW GLOBAL AGAR BISA DIPANGGUL DARI HTML
+        // FUNGSI GLOBAL
         window.addVote = async (key) => {
             try {
                 const voteRef = ref(db, `paslon/${key}/suara`);
@@ -263,6 +291,26 @@
             }
         };
 
+        // Fungsi Update / Unggah URL Foto Paslon
+        window.updateFoto = async (key, tipe) => {
+            const currentUrl = currentPaslonData[key]?.[tipe] || '';
+            const newUrl = prompt(`Masukkan URL Foto ${tipe === 'foto_ketua' ? 'Ketua' : 'Wakil'} baru:`, currentUrl);
+            
+            if (newUrl !== null && newUrl.trim() !== '') {
+                await set(ref(db, `paslon/${key}/${tipe}`), newUrl.trim());
+                showAlert("Foto berhasil diperbarui!");
+            }
+        };
+
+        // Fungsi Hapus Foto (Silang)
+        window.removeFoto = async (key, tipe) => {
+            if (confirm(`Hapus foto ${tipe === 'foto_ketua' ? 'Ketua' : 'Wakil'} ini?`)) {
+                const defaultFallback = tipe === 'foto_ketua' ? 'assets/logo-sekolah.png' : 'assets/logo-osis.png';
+                await set(ref(db, `paslon/${key}/${tipe}`), defaultFallback);
+                showAlert("Foto berhasil dikembalikan ke default!");
+            }
+        };
+
         // Realtime Listener Firebase
         const mainRef = ref(db);
         onValue(mainRef, (snapshot) => {
@@ -280,7 +328,7 @@
             document.getElementById('totalSuaraText').innerText = totalMasuk;
 
             if (isSuperAdmin) {
-                renderAdminPaslonList(currentPaslonData);
+                renderAdminPaslonTable(currentPaslonData);
                 document.getElementById('settingJudul').value = currentSettings.judul || '';
                 document.getElementById('settingSekolah').value = currentSettings.nama_sekolah || '';
                 document.getElementById('settingDpt').value = currentSettings.total_dpt || 500;
@@ -289,7 +337,7 @@
             renderPrintDocument(currentPaslonData, suaraTidakSah, totalMasuk);
         });
 
-        // 1. Render Tombol Tap Input Suara
+        // 1. Render Tombol Tap Input Suara (Saksi & Admin)
         function renderTallyButtons(paslonData) {
             tallyGrid.innerHTML = '';
             const keys = Object.keys(paslonData);
@@ -353,33 +401,63 @@
             batchContainer.classList.add('hidden');
         });
 
-        // 2. Fitur Super Admin (Render & Hapus Paslon)
-        function renderAdminPaslonList(paslonData) {
-            const list = document.getElementById('adminPaslonList');
-            list.innerHTML = '';
+        // 2. TABEL KELOLA PASLON REAL-TIME (Lengkap Kolom Nama, Unggah/Silang Foto, Hapus Paslon)
+        function renderAdminPaslonTable(paslonData) {
+            const tbody = document.getElementById('adminPaslonTableBody');
+            tbody.innerHTML = '';
             const keys = Object.keys(paslonData);
+            
             if (keys.length === 0) {
-                list.innerHTML = `<p class="text-xs text-gray-400 italic">Belum ada daftar paslon.</p>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center p-4 text-xs text-gray-400 italic">Belum ada daftar pasangan calon. Silakan klik + Tambah Paslon Baru.</td></tr>`;
                 return;
             }
+
             keys.forEach(key => {
                 const p = paslonData[key];
-                list.innerHTML += `
-                    <div class="p-3 border rounded-xl flex justify-between items-center bg-gray-50 text-xs md:text-sm">
-                        <div>
-                            <span class="font-bold text-blue-600">No. ${p.no_urut}</span>: 
-                            <span class="font-semibold text-gray-800">${p.nama_ketua} & ${p.nama_wakil}</span>
-                            <span class="text-xs text-gray-400 ml-2">(${p.suara || 0} suara)</span>
-                        </div>
-                        <button onclick="window.deletePaslon('${key}')" class="text-red-600 hover:text-red-800 font-bold bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg border border-red-200 transition">
-                            🗑️ Hapus
-                        </button>
-                    </div>
+                const fk = p.foto_ketua || 'assets/logo-sekolah.png';
+                const fw = p.foto_wakil || 'assets/logo-osis.png';
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50 transition">
+                        <!-- No Urut -->
+                        <td class="p-3 text-center font-bold text-blue-600">0${p.no_urut}</td>
+                        
+                        <!-- Nama Ketua -->
+                        <td class="p-3 font-bold text-gray-800">${p.nama_ketua}</td>
+                        
+                        <!-- Nama Wakil -->
+                        <td class="p-3 font-bold text-gray-800">${p.nama_wakil}</td>
+                        
+                        <!-- Foto Ketua + Tombol Unggah/Silang -->
+                        <td class="p-3 text-center">
+                            <div class="flex items-center justify-center space-x-2">
+                                <img src="${fk}" alt="Foto Ketua" class="w-10 h-10 rounded-lg object-cover border" onerror="this.src='assets/logo-sekolah.png'">
+                                <button onclick="window.updateFoto('${key}', 'foto_ketua')" title="Unggah / Ubah URL Foto" class="p-1 text-xs bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-md font-bold">📤</button>
+                                <button onclick="window.removeFoto('${key}', 'foto_ketua')" title="Hapus / Reset Foto" class="p-1 text-xs bg-red-100 text-red-700 hover:bg-red-200 rounded-md font-bold">❌</button>
+                            </div>
+                        </td>
+
+                        <!-- Foto Wakil + Tombol Unggah/Silang -->
+                        <td class="p-3 text-center">
+                            <div class="flex items-center justify-center space-x-2">
+                                <img src="${fw}" alt="Foto Wakil" class="w-10 h-10 rounded-lg object-cover border" onerror="this.src='assets/logo-osis.png'">
+                                <button onclick="window.updateFoto('${key}', 'foto_wakil')" title="Unggah / Ubah URL Foto" class="p-1 text-xs bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-md font-bold">📤</button>
+                                <button onclick="window.removeFoto('${key}', 'foto_wakil')" title="Hapus / Reset Foto" class="p-1 text-xs bg-red-100 text-red-700 hover:bg-red-200 rounded-md font-bold">❌</button>
+                            </div>
+                        </td>
+
+                        <!-- Tombol Hapus Paslon -->
+                        <td class="p-3 text-center">
+                            <button onclick="window.deletePaslon('${key}')" class="text-xs bg-red-500 hover:bg-red-600 text-white font-bold px-3 py-1.5 rounded-lg shadow transition">
+                                🗑️ Hapus
+                            </button>
+                        </td>
+                    </tr>
                 `;
             });
         }
 
-        // Tambah Paslon Baru
+        // Toggle Form Tambah Paslon
         document.getElementById('btnOpenAddPaslon').addEventListener('click', () => {
             document.getElementById('addPaslonForm').classList.remove('hidden');
         });
@@ -387,6 +465,7 @@
             document.getElementById('addPaslonForm').classList.add('hidden');
         });
 
+        // Simpan Paslon Baru
         document.getElementById('btnSaveNewPaslon').addEventListener('click', async () => {
             const ketua = document.getElementById('newNamaKetua').value.trim();
             const wakil = document.getElementById('newNamaWakil').value.trim();
