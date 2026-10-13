@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Display Quick Count Pemilihan OSIS</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js untuk Grafik Real-time -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Font Family Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col justify-between items-center p-4 md:p-6">
+
+    <!-- Header & Judul Utama (Sesuai Sketsa) -->
+    <header class="text-center my-4 w-full max-w-6xl">
+        <h1 id="judulPemilihan" class="text-2xl md:text-4xl lg:text-5xl font-black text-gray-800 tracking-wide uppercase leading-tight">
+            QUICK COUNT PEMILIHAN<br class="hidden sm:inline"> KETUA-WAKIL KETUA OSIS
+        </h1>
+        <p id="namaSekolah" class="mt-2 text-sm md:text-lg font-bold text-gray-500 tracking-widest uppercase">
+            -- PERHITUNGAN SUARA REAL-TIME --
+        </p>
+    </header>
+
+    <!-- Main Container: Cards Paslon & Chart -->
+    <main class="w-full max-w-7xl flex-grow flex flex-col items-center justify-center space-y-10 my-6">
+
+        <!-- Grid Cards Paslon (Dinamis dari Firebase & Presisi Sesuai Sketsa) -->
+        <div id="paslonContainer" class="w-full flex flex-wrap items-center justify-center gap-6 md:gap-8">
+            <!-- Kartu Paslon akan dirender secara dinamis melalui JavaScript -->
+        </div>
+
+        <!-- Section Grafik Perolehan Suara & Ringkasan -->
+        <div class="w-full max-w-4xl bg-white p-6 md:p-8 rounded-3xl shadow-lg border border-gray-100">
+            <h2 class="text-xl md:text-2xl font-bold text-center text-gray-700 mb-6 uppercase tracking-wider">
+                Grafik Perolehan Suara Sah
+            </h2>
+            <div class="relative w-full h-64 md:h-80">
+                <canvas id="voteChart"></canvas>
+            </div>
+
+            <!-- Ringkasan Suara Masuk -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 pt-6 border-t border-gray-100 text-center">
+                <div class="p-3 bg-gray-50 rounded-2xl">
+                    <span class="block text-xs text-gray-500 font-semibold uppercase">Total DPT</span>
+                    <span id="statDpt" class="text-lg md:text-xl font-bold text-gray-800">500</span>
+                </div>
+                <div class="p-3 bg-blue-50 rounded-2xl">
+                    <span class="block text-xs text-blue-600 font-semibold uppercase">Suara Masuk</span>
+                    <span id="statMasuk" class="text-lg md:text-xl font-bold text-blue-700">0</span>
+                </div>
+                <div class="p-3 bg-amber-50 rounded-2xl">
+                    <span class="block text-xs text-amber-600 font-semibold uppercase">Suara Tidak Sah</span>
+                    <span id="statTidakSah" class="text-lg md:text-xl font-bold text-amber-700">0</span>
+                </div>
+                <div class="p-3 bg-emerald-50 rounded-2xl">
+                    <span class="block text-xs text-emerald-600 font-semibold uppercase">Progress Data</span>
+                    <span id="statProgress" class="text-lg md:text-xl font-bold text-emerald-700">0%</span>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full text-center py-4 text-xs md:text-sm text-gray-400 font-medium">
+        &copy; 2026 Quick Count Pemilu OSIS. Powered by Firebase & GitHub Pages.
+    </footer>
+
+    <!-- Firebase & Chart Script -->
+    <script type="module">
+        import { db, ref, onValue } from './app.js';
+
+        const paslonContainer = document.getElementById('paslonContainer');
+        let voteChart = null;
+
+        // Inisialisasi Chart.js
+        function initChart() {
+            const ctx = document.getElementById('voteChart').getContext('2d');
+            voteChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Jumlah Suara Sah',
+                        data: [],
+                        backgroundColor: [
+                            '#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'
+                        ],
+                        borderRadius: 12,
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { precision: 0 }
+                        }
+                    }
+                }
+            });
+        }
+
+        initChart();
+
+        // Real-time Listener dari Firebase Realtime Database
+        const mainRef = ref(db);
+        onValue(mainRef, (snapshot) => {
+            const data = snapshot.val() || {};
+            const settings = data.settings || {};
+            const paslonData = data.paslon || {};
+            const suaraTidakSah = data.suara_tidak_sah || 0;
+
+            // 1. Update Judul & Sekolah
+            if (settings.judul) document.getElementById('judulPemilihan').innerText = settings.judul;
+            if (settings.nama_sekolah) document.getElementById('namaSekolah').innerText = settings.nama_sekolah;
+
+            // 2. Hitung Total Suara
+            let totalSuaraSah = 0;
+            Object.values(paslonData).forEach(p => totalSuaraSah += (p.suara || 0));
+            const totalSuaraMasuk = totalSuaraSah + suaraTidakSah;
+            const totalDpt = settings.total_dpt || 500;
+
+            // 3. Render Cards Paslon (Presisi Sesuai Sketsa)
+            paslonContainer.innerHTML = '';
+            const labelsChart = [];
+            const dataChart = [];
+
+            Object.keys(paslonData).forEach(key => {
+                const paslon = paslonData[key];
+                const noUrut = paslon.no_urut || key;
+                const suara = paslon.suara || 0;
+                const persentase = totalSuaraMasuk > 0 ? ((suara / totalSuaraMasuk) * 100).toFixed(1) : 0;
+
+                labelsChart.push(`Paslon 0${noUrut}`);
+                dataChart.push(suara);
+
+                // Elemen Kartu Paslon (Frame Biru)
+                const card = document.createElement('div');
+                card.className = "w-full sm:w-80 md:w-96 bg-blue-500 rounded-3xl p-5 md:p-6 shadow-xl text-white flex flex-col justify-between transform hover:scale-105 transition duration-300 relative border-4 border-blue-400";
+
+                card.innerHTML = `
+                    <!-- Wadah Dua Foto Calon (Kuning/Orange di Sketsa) -->
+                    <div class="grid grid-cols-2 gap-3 md:gap-4 mb-4">
+                        <!-- Foto Ketua -->
+                        <div class="bg-amber-400 rounded-2xl h-44 sm:h-48 md:h-52 overflow-hidden shadow-inner flex items-center justify-center p-1 border-2 border-amber-300">
+                            <img src="${paslon.foto_ketua || 'assets/logo-sekolah.png'}" 
+                                 alt="Foto Ketua" 
+                                 class="w-full h-full object-cover rounded-xl"
+                                 onerror="this.src='assets/logo-sekolah.png'">
+                        </div>
+
+                        <!-- Foto Wakil -->
+                        <div class="bg-amber-400 rounded-2xl h-44 sm:h-48 md:h-52 overflow-hidden shadow-inner flex items-center justify-center p-1 border-2 border-amber-300">
+                            <img src="${paslon.foto_wakil || 'assets/logo-osis.png'}" 
+                                 alt="Foto Wakil" 
+                                 class="w-full h-full object-cover rounded-xl"
+                                 onerror="this.src='assets/logo-osis.png'">
+                        </div>
+                    </div>
+
+                    <!-- Nomor Urut Lingkaran (Tengah Bawah Antara Foto & Nama) -->
+                    <div class="relative flex items-center justify-center my-2">
+                        <div class="w-12 h-12 md:w-14 md:h-14 bg-amber-500 text-white font-extrabold text-xl md:text-2xl rounded-full border-4 border-white shadow-lg flex items-center justify-center z-10">
+                            ${noUrut}
+                        </div>
+                    </div>
+
+                    <!-- Nama Ketua (Kiri) & Nama Wakil (Kanan) -->
+                    <div class="grid grid-cols-2 gap-2 text-center text-xs md:text-sm font-bold tracking-wide mt-1 pb-3 border-b border-blue-400">
+                        <div class="truncate px-1">${paslon.nama_ketua || 'Nama Ketua'}</div>
+                        <div class="truncate px-1">${paslon.nama_wakil || 'Nama Wakil'}</div>
+                    </div>
+
+                    <!-- Perolehan Suara & Persentase -->
+                    <div class="mt-4 text-center">
+                        <div class="text-3xl md:text-4xl font-black tracking-wider text-amber-300">
+                            ${suara} <span class="text-sm font-medium text-white">Suara</span>
+                        </div>
+                        <div class="text-sm font-semibold text-blue-100 mt-0.5">
+                            ${persentase}% Dari Total Suara
+                        </div>
+                    </div>
+                `;
+
+                paslonContainer.appendChild(card);
+            });
+
+            // 4. Update Grafik
+            if (voteChart) {
+                voteChart.data.labels = labelsChart;
+                voteChart.data.datasets[0].data = dataChart;
+                voteChart.update();
+            }
+
+            // 5. Update Stat Ringkasan
+            document.getElementById('statDpt').innerText = totalDpt;
+            document.getElementById('statMasuk').innerText = totalSuaraMasuk;
+            document.getElementById('statTidakSah').innerText = suaraTidakSah;
+
+            const progressPct = ((totalSuaraMasuk / totalDpt) * 100).toFixed(1);
+            document.getElementById('statProgress').innerText = `${progressPct}%`;
+        });
+    </script>
+</body>
+</html>
