@@ -38,14 +38,23 @@
         <!-- Pesan Status Global -->
         <div id="statusAlert" class="hidden p-4 rounded-xl text-center font-semibold text-sm shadow-sm transition"></div>
 
+        <!-- Banner Peringatan DPT Penuh -->
+        <div id="dptFullBanner" class="hidden bg-red-500 text-white p-4 rounded-2xl text-center font-bold text-sm shadow-md animate-pulse">
+            ⚠️ KUOTA DPT TELAH TERPENUHI! SELURUH TOMBOL INPUT SUARA TELAH DIKUNCI / NONAKTIF.
+        </div>
+
         <!-- SECTION 1: INPUT SUARA REAL-TIME (Saksi & Admin) -->
         <section class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-            <div class="flex justify-between items-center mb-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 mb-6">
                 <div>
                     <h2 class="text-xl font-bold text-gray-800">Input Suara (1 Kotak Suara)</h2>
                     <p class="text-xs text-gray-500 mt-0.5">Tekan tombol paslon setiap kali surat suara dibacakan (*Real-time Tally*)</p>
                 </div>
-                <span class="text-xs bg-gray-100 text-gray-600 font-bold px-3 py-1 rounded-lg">Total Suara Masuk: <span id="totalSuaraText" class="text-blue-600">0</span></span>
+                <div class="flex items-center space-x-2">
+                    <span class="text-xs bg-gray-100 text-gray-600 font-bold px-3 py-1.5 rounded-lg">
+                        Total Suara: <span id="totalSuaraText" class="text-blue-600">0</span> / <span id="textDptLimit">500</span> DPT
+                    </span>
+                </div>
             </div>
 
             <!-- Grid Tombol Tap Paslon -->
@@ -55,12 +64,12 @@
 
             <!-- Input Suara Tidak Sah & Batch Manual -->
             <div class="mt-6 pt-6 border-t flex flex-col md:flex-row justify-between items-center gap-4">
-                <button id="btnAddTidakSah" class="w-full md:w-auto bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-6 rounded-xl shadow transition flex items-center justify-center space-x-2">
+                <button id="btnAddTidakSah" class="w-full md:w-auto bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-6 rounded-xl shadow transition flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed">
                     <span>+1 Suara Tidak Sah / Batal</span>
                     <span id="badgeTidakSah" class="bg-amber-700 text-xs px-2 py-0.5 rounded-full">0</span>
                 </button>
 
-                <button id="btnToggleBatch" class="text-sm font-semibold text-blue-600 hover:underline">
+                <button id="btnToggleBatch" class="text-sm font-semibold text-blue-600 hover:underline disabled:opacity-50 disabled:no-underline">
                     &plus; Mode Input Manual Total (Batch)
                 </button>
             </div>
@@ -69,7 +78,9 @@
             <div id="batchInputContainer" class="hidden mt-6 p-4 bg-gray-50 rounded-xl border border-gray-200">
                 <h3 class="text-sm font-bold text-gray-700 mb-3">Input Direct/Batch Suara Akhir:</h3>
                 <div id="batchFields" class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4"></div>
-                <button id="btnSaveBatch" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-lg text-sm w-full transition">Simpan Semua Data Suara</button>
+                <button id="btnSaveBatch" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-lg text-sm w-full transition disabled:opacity-50 disabled:cursor-not-allowed">
+                    Simpan Semua Data Suara
+                </button>
             </div>
         </section>
 
@@ -261,8 +272,10 @@
 
         const tallyGrid = document.getElementById('tallyGrid');
         const alertBox = document.getElementById('statusAlert');
+        const dptBanner = document.getElementById('dptFullBanner');
         let currentPaslonData = {};
         let currentSettings = { total_dpt: 500, judul: '', nama_sekolah: '' };
+        let isDptFull = false;
 
         function showAlert(msg, isSuccess = true) {
             alertBox.className = `p-4 rounded-xl text-center font-semibold text-sm shadow-sm transition block ${isSuccess ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`;
@@ -270,8 +283,12 @@
             setTimeout(() => { alertBox.classList.add('hidden'); }, 3000);
         }
 
-        // DAFTARKAN FUNGSI GLOBAL KE WINDOW
+        // DAFTARKAN FUNGSI GLOBAL
         window.addVote = async (key) => {
+            if (isDptFull) {
+                showAlert("Gagal: Total suara sudah mencapai batas DPT!", false);
+                return;
+            }
             try {
                 const voteRef = ref(db, `paslon/${key}/suara`);
                 await runTransaction(voteRef, (curr) => (curr || 0) + 1);
@@ -333,27 +350,45 @@
             currentPaslonData = data.paslon || {};
             currentSettings = data.settings || currentSettings;
             const suaraTidakSah = data.suara_tidak_sah || 0;
-
-            renderTallyButtons(currentPaslonData);
-            document.getElementById('badgeTidakSah').innerText = suaraTidakSah;
+            const maxDpt = currentSettings.total_dpt || 500;
 
             let totalSah = 0;
             Object.values(currentPaslonData).forEach(p => totalSah += (p.suara || 0));
             const totalMasuk = totalSah + suaraTidakSah;
+
+            // CEK APAKAH DPT SUDAH TERPENUHI
+            isDptFull = totalMasuk >= maxDpt;
+
+            // Tampilkan / Sembunyikan Peringatan DPT Penuh
+            if (isDptFull) {
+                dptBanner.classList.remove('hidden');
+            } else {
+                dptBanner.classList.add('hidden');
+            }
+
+            // Render Tombol & Kunci Jika Penuh
+            renderTallyButtons(currentPaslonData, isDptFull);
+            
+            document.getElementById('badgeTidakSah').innerText = suaraTidakSah;
             document.getElementById('totalSuaraText').innerText = totalMasuk;
+            document.getElementById('textDptLimit').innerText = maxDpt;
+
+            // Nonaktifkan Tombol Suara Tidak Sah jika DPT Penuh
+            const btnTs = document.getElementById('btnAddTidakSah');
+            btnTs.disabled = isDptFull;
 
             if (isSuperAdmin) {
                 renderAdminPaslonTable(currentPaslonData);
                 document.getElementById('settingJudul').value = currentSettings.judul || '';
                 document.getElementById('settingSekolah').value = currentSettings.nama_sekolah || '';
-                document.getElementById('settingDpt').value = currentSettings.total_dpt || 500;
+                document.getElementById('settingDpt').value = maxDpt;
             }
 
             renderPrintDocument(currentPaslonData, suaraTidakSah, totalMasuk);
         });
 
-        // 1. Render Tombol Tap Input Suara
-        function renderTallyButtons(paslonData) {
+        // 1. Render Tombol Tap Input Suara dengan Penguncian DPT
+        function renderTallyButtons(paslonData, isFull) {
             tallyGrid.innerHTML = '';
             const keys = Object.keys(paslonData);
             if (keys.length === 0) {
@@ -363,16 +398,18 @@
             keys.forEach(key => {
                 const paslon = paslonData[key];
                 const card = document.createElement('div');
-                card.className = "bg-blue-50 border-2 border-blue-200 hover:border-blue-500 rounded-xl p-4 flex flex-col justify-between shadow-sm transition";
+                card.className = `border-2 rounded-xl p-4 flex flex-col justify-between shadow-sm transition ${isFull ? 'bg-gray-100 border-gray-300 opacity-60' : 'bg-blue-50 border-blue-200 hover:border-blue-500'}`;
+                
                 card.innerHTML = `
                     <div class="mb-3">
-                        <span class="text-xs font-bold bg-blue-600 text-white px-2 py-0.5 rounded-md">Paslon ${paslon.no_urut || key}</span>
+                        <span class="text-xs font-bold ${isFull ? 'bg-gray-500' : 'bg-blue-600'} text-white px-2 py-0.5 rounded-md">Paslon ${paslon.no_urut || key}</span>
                         <h3 class="font-bold text-gray-800 text-sm mt-2">${paslon.nama_ketua || '-'} & ${paslon.nama_wakil || '-'}</h3>
                     </div>
                     <div class="flex items-center justify-between">
-                        <span class="text-2xl font-black text-blue-700">${paslon.suara || 0} <span class="text-xs text-gray-500 font-normal">Suara</span></span>
-                        <button onclick="window.addVote('${key}')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-sm shadow active:scale-95 transition">
-                            +1 Suara
+                        <span class="text-2xl font-black ${isFull ? 'text-gray-600' : 'text-blue-700'}">${paslon.suara || 0} <span class="text-xs text-gray-500 font-normal">Suara</span></span>
+                        <button onclick="window.addVote('${key}')" ${isFull ? 'disabled' : ''} 
+                                class="font-bold py-2 px-4 rounded-lg text-sm shadow transition ${isFull ? 'bg-gray-400 text-gray-200 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white active:scale-95'}">
+                            ${isFull ? 'Penuh' : '+1 Suara'}
                         </button>
                     </div>
                 `;
@@ -382,6 +419,10 @@
 
         // Suara Tidak Sah
         document.getElementById('btnAddTidakSah').addEventListener('click', async () => {
+            if (isDptFull) {
+                showAlert("Gagal: Total suara sudah mencapai batas DPT!", false);
+                return;
+            }
             const tsRef = ref(db, 'suara_tidak_sah');
             await runTransaction(tsRef, (curr) => (curr || 0) + 1);
             showAlert("Suara tidak sah ditambahkan!");
@@ -408,6 +449,16 @@
         });
 
         document.getElementById('btnSaveBatch').addEventListener('click', async () => {
+            let tempTotal = 0;
+            Object.keys(currentPaslonData).forEach(key => {
+                const val = parseInt(document.getElementById(`batch_${key}`).value) || 0;
+                tempTotal += val;
+            });
+            const maxDpt = currentSettings.total_dpt || 500;
+            if (tempTotal > maxDpt) {
+                return showAlert(`Gagal: Total input batch (${tempTotal}) melebihi kuota DPT (${maxDpt})!`, false);
+            }
+
             for (let key of Object.keys(currentPaslonData)) {
                 const val = parseInt(document.getElementById(`batch_${key}`).value) || 0;
                 await set(ref(db, `paslon/${key}/suara`), val);
@@ -438,7 +489,6 @@
                         <td class="p-3 font-bold text-gray-800">${p.nama_ketua}</td>
                         <td class="p-3 font-bold text-gray-800">${p.nama_wakil}</td>
                         
-                        <!-- Foto Ketua -->
                         <td class="p-3 text-center">
                             <div class="flex items-center justify-center space-x-1.5">
                                 <img src="${fk}" alt="Foto Ketua" class="w-9 h-9 rounded-lg object-cover border" onerror="this.src='assets/logo-sekolah.png'">
@@ -447,7 +497,6 @@
                             </div>
                         </td>
 
-                        <!-- Foto Wakil -->
                         <td class="p-3 text-center">
                             <div class="flex items-center justify-center space-x-1.5">
                                 <img src="${fw}" alt="Foto Wakil" class="w-9 h-9 rounded-lg object-cover border" onerror="this.src='assets/logo-osis.png'">
@@ -456,7 +505,6 @@
                             </div>
                         </td>
 
-                        <!-- Tombol Edit & Hapus BERDAMPINGAN -->
                         <td class="p-3 text-center">
                             <div class="flex items-center justify-center space-x-2">
                                 <button onclick="window.editPaslon('${key}')" class="text-xs bg-amber-500 hover:bg-amber-600 text-white font-bold px-2.5 py-1.5 rounded-lg shadow transition whitespace-nowrap">
@@ -472,7 +520,6 @@
             });
         }
 
-        // Reset Form ke Mode Tambah
         function resetPaslonForm() {
             document.getElementById('formPaslonTitle').innerText = "Form Tambah Paslon Baru";
             document.getElementById('editPaslonKey').value = "";
@@ -483,7 +530,6 @@
             document.getElementById('addPaslonForm').classList.add('hidden');
         }
 
-        // Toggle Form
         document.getElementById('btnOpenAddPaslon').addEventListener('click', () => {
             resetPaslonForm();
             document.getElementById('addPaslonForm').classList.remove('hidden');
@@ -492,7 +538,6 @@
             resetPaslonForm();
         });
 
-        // Simpan
         document.getElementById('btnSaveNewPaslon').addEventListener('click', async () => {
             const key = document.getElementById('editPaslonKey').value;
             const ketua = document.getElementById('newNamaKetua').value.trim();
@@ -526,7 +571,6 @@
             resetPaslonForm();
         });
 
-        // Settings
         document.getElementById('btnSaveSettings').addEventListener('click', async () => {
             await set(ref(db, 'settings'), {
                 judul: document.getElementById('settingJudul').value,
@@ -536,7 +580,6 @@
             showAlert("Pengaturan berhasil disimpan!");
         });
 
-        // Reset Suara
         document.getElementById('btnResetSuara').addEventListener('click', async () => {
             if (confirm("PERINGATAN! Semua perolehan suara akan dikembalikan ke 0. Lanjutkan?")) {
                 Object.keys(currentPaslonData).forEach(async (key) => {
@@ -547,7 +590,6 @@
             }
         });
 
-        // Print Document
         function renderPrintDocument(paslonData, tidakSah, total) {
             document.getElementById('printSekolah').innerText = currentSettings.nama_sekolah || 'SMA NEGERI / OSIS';
             document.getElementById('printJudul').innerText = currentSettings.judul || 'BERITA ACARA HASIL PERHITUNGAN SUARA';
