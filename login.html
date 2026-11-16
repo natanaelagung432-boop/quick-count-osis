@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -7,7 +6,6 @@
     <title>Login - Quick Count OSIS</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
-
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
 
     <style>
@@ -23,7 +21,6 @@
 
         <!-- LOGO -->
         <div class="flex items-center justify-center space-x-6 md:space-x-8 mb-8 w-full">
-
             <div class="flex items-center justify-center w-24 h-14 md:w-32 md:h-18 bg-white border-2 border-blue-500 rounded-full shadow-md p-1.5 overflow-hidden">
                 <img id="logoSekolah"
                      src="assets/logo-sekolah.png"
@@ -39,7 +36,6 @@
                      class="w-full h-full object-contain"
                      onerror="this.onerror=null;this.src='assets/logo-osis.jpg';">
             </div>
-
         </div>
 
         <!-- JUDUL -->
@@ -47,7 +43,6 @@
             <h1 class="text-3xl md:text-4xl font-extrabold text-gray-800 tracking-wider uppercase">
                 LOGIN
             </h1>
-
             <p class="text-xs md:text-sm text-gray-500 font-medium mt-1">
                 Masuk untuk mengunggah atau mengelola data suara
             </p>
@@ -55,7 +50,6 @@
 
         <!-- FORM LOGIN -->
         <form id="loginForm" class="w-full flex flex-col space-y-4 px-4">
-
             <div>
                 <input
                     type="text"
@@ -95,7 +89,6 @@
                class="text-center text-xs md:text-sm text-gray-500 hover:text-gray-800 font-medium transition duration-200 mt-2 block">
                 &larr; Kembali ke Halaman Utama
             </a>
-
         </form>
 
     </div>
@@ -105,9 +98,8 @@
         &copy; 2026 Quick Count Pemilu OSIS. Powered by Firebase & GitHub Pages.
     </footer>
 
-    <!-- FIREBASE LOGIN -->
+    <!-- FIREBASE LOGIN SCRIPT -->
     <script type="module">
-
         import { db, ref, get } from './app.js';
 
         const loginForm = document.getElementById('loginForm');
@@ -115,54 +107,40 @@
         const loginButton = document.getElementById('loginButton');
 
         function showMessage(message, type = 'error') {
-
             const styles = {
                 error: 'bg-red-100 text-red-700',
                 success: 'bg-green-100 text-green-700',
                 info: 'bg-blue-100 text-blue-700'
             };
 
-            loginMessage.className =
-                `text-center text-sm font-semibold p-3 rounded-lg block ${styles[type]}`;
-
+            loginMessage.className = `text-center text-sm font-semibold p-3 rounded-lg block ${styles[type]}`;
             loginMessage.textContent = message;
         }
 
         function firebaseErrorMessage(error) {
-
             console.error('Firebase Error:', error);
-
             switch (error.code) {
-
                 case 'PERMISSION_DENIED':
                 case 'database/permission-denied':
                     return 'Akses database ditolak. Periksa Firebase Rules.';
-
                 case 'NETWORK_ERROR':
                 case 'unavailable':
                 case 'database/unavailable':
                     return 'Server Firebase tidak dapat dijangkau. Periksa jaringan.';
-
                 case 'auth/unauthorized-domain':
                     return 'Domain website belum diizinkan di Firebase.';
-
                 default:
-                    return 'Firebase Error: ' +
-                        (error.code || error.message || 'Tidak diketahui');
+                    return 'Firebase Error: ' + (error.code || error.message || 'Tidak diketahui');
             }
         }
 
         loginForm.addEventListener('submit', async (e) => {
-
             e.preventDefault();
 
             if (loginButton.disabled) return;
 
-            const usernameInput =
-                document.getElementById('username').value.trim();
-
-            const passwordInput =
-                document.getElementById('password').value;
+            const usernameInput = document.getElementById('username').value.trim();
+            const passwordInput = document.getElementById('password').value.trim();
 
             if (!usernameInput || !passwordInput) {
                 showMessage('Username dan password wajib diisi.');
@@ -171,18 +149,14 @@
 
             loginButton.disabled = true;
             loginButton.textContent = 'MEMVERIFIKASI...';
-
             showMessage('Menghubungkan ke database...', 'info');
 
             try {
-
-                // Membaca database Firebase
-                const snapshot = await get(ref(db, 'users'));
+                // Membaca database Firebase dari node 'Users' (huruf U besar sesuai database)[span_1](start_span)[span_1](end_span)
+                const snapshot = await get(ref(db, 'Users'));
 
                 if (!snapshot.exists()) {
-                    showMessage(
-                        'Data pengguna belum tersedia di database Firebase.'
-                    );
+                    showMessage('Data pengguna (node Users) belum tersedia di database Firebase.');
                     return;
                 }
 
@@ -193,17 +167,16 @@
                     return;
                 }
 
-                // Verifikasi username dan password
                 let authenticatedUser = null;
 
                 for (const key of Object.keys(users)) {
-
                     const user = users[key];
 
+                    // Menggunakan String() trim() agar pencocokan aman dari perbedaan tipe data
                     if (
                         user &&
-                        user.username === usernameInput &&
-                        user.password === passwordInput
+                        String(user.username).trim() === usernameInput &&
+                        String(user.password).trim() === passwordInput
                     ) {
                         authenticatedUser = user;
                         break;
@@ -215,46 +188,35 @@
                     return;
                 }
 
-                if (
-                    !['saksi', 'superadmin'].includes(
-                        authenticatedUser.role
-                    )
-                ) {
+                const userRole = String(authenticatedUser.role).trim().toLowerCase();
+
+                if (!['saksi', 'superadmin'].includes(userRole)) {
                     showMessage('Role pengguna tidak valid.');
                     return;
                 }
 
-                // Simpan sesi sederhana (belum merupakan autentikasi aman)
+                // Simpan sesi ke localStorage
                 localStorage.setItem(
                     'currentUser',
                     JSON.stringify({
-                        username: authenticatedUser.username,
-                        role: authenticatedUser.role
+                        username: String(authenticatedUser.username).trim(),
+                        role: userRole
                     })
                 );
 
-                showMessage(
-                    'Login berhasil! Mengalihkan halaman...',
-                    'success'
-                );
+                showMessage('Login berhasil! Mengalihkan halaman...', 'success');
 
                 setTimeout(() => {
                     window.location.href = 'admin.html';
                 }, 1000);
 
             } catch (error) {
-
                 showMessage(firebaseErrorMessage(error));
-
             } finally {
-
                 loginButton.disabled = false;
                 loginButton.textContent = 'MASUK';
-
             }
-
         });
-
     </script>
 
 </body>
