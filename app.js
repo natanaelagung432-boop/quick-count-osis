@@ -1,17 +1,25 @@
-// Import fungsi-fungsi Firebase SDK v10 langsung dari CDN (Mode Browser Module)
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { 
-    getDatabase, 
-    ref, 
-    set, 
-    get, 
-    child, 
-    onValue, 
-    runTransaction, 
-    remove 
+
+// ============================================
+// QUICK COUNT OSIS
+// Firebase Configuration & Initialization
+// Firebase SDK v10.12.0
+// ============================================
+
+import { initializeApp, getApps, getApp }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+
+import {
+  getDatabase,
+  ref,
+  set,
+  get,
+  child,
+  onValue,
+  runTransaction,
+  remove
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-// Konfigurasi Firebase dari akun Anda
+// Konfigurasi Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyB2bJGB_cdEumexT7CF2PpBLgpzmNieit8",
   authDomain: "quickcount-osis.firebaseapp.com",
@@ -22,9 +30,25 @@ const firebaseConfig = {
   appId: "1:745494309973:web:af3507815e4bece74a38dc"
 };
 
-// Inisialisasi Firebase App & Realtime Database
-const app = initializeApp(firebaseConfig);
+// Inisialisasi Firebase (hindari duplikasi)
+const app = getApps().length
+  ? getApp()
+  : initializeApp(firebaseConfig);
+
+// Inisialisasi Realtime Database
 const db = getDatabase(app);
 
-// Ekspor modul agar bisa digunakan di index.html, login.html, display.html, dan admin.html
-export { db, ref, set, get, child, onValue, runTransaction, remove };
+// Export fungsi untuk seluruh halaman
+export {
+  app,
+  db,
+  ref,
+  set,
+  get,
+  child,
+  onValue,
+  runTransaction,
+  remove
+};
+
+console.log("Quick Count OSIS: Firebase berhasil diinisialisasi.");
