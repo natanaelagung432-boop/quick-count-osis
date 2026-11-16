@@ -1,54 +1,54 @@
 
-// ============================================
-// QUICK COUNT OSIS
-// Firebase Configuration & Initialization
-// Firebase SDK v10.12.0
-// ============================================
+/* =====================================
+   QUICK COUNT OSIS
+   FIREBASE INITIALIZATION
+   Browser ES Module - GitHub Pages
+   ===================================== */
 
 import { initializeApp, getApps, getApp }
-  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 
 import {
-  getDatabase,
-  ref,
-  set,
-  get,
-  child,
-  onValue,
-  runTransaction,
-  remove
+    getDatabase,
+    ref,
+    set,
+    get,
+    child,
+    onValue,
+    runTransaction,
+    remove
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-// Konfigurasi Firebase
+// Firebase Configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyB2bJGB_cdEumexT7CF2PpBLgpzmNieit8",
-  authDomain: "quickcount-osis.firebaseapp.com",
-  databaseURL: "https://quickcount-osis-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "quickcount-osis",
-  storageBucket: "quickcount-osis.firebasestorage.app",
-  messagingSenderId: "745494309973",
-  appId: "1:745494309973:web:af3507815e4bece74a38dc"
+    apiKey: "AIzaSyB2bJGB_cdEumexT7CF2PpBLgpzmNieit8",
+    authDomain: "quickcount-osis.firebaseapp.com",
+    databaseURL: "https://quickcount-osis-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "quickcount-osis",
+    storageBucket: "quickcount-osis.firebasestorage.app",
+    messagingSenderId: "745494309973",
+    appId: "1:745494309973:web:af3507815e4bece74a38dc"
 };
 
-// Inisialisasi Firebase (hindari duplikasi)
-const app = getApps().length
-  ? getApp()
-  : initializeApp(firebaseConfig);
+// Initialize Firebase
+const app = getApps().length > 0
+    ? getApp()
+    : initializeApp(firebaseConfig);
 
-// Inisialisasi Realtime Database
+// Initialize Realtime Database
 const db = getDatabase(app);
 
-// Export fungsi untuk seluruh halaman
+// Export Firebase
 export {
-  app,
-  db,
-  ref,
-  set,
-  get,
-  child,
-  onValue,
-  runTransaction,
-  remove
+    app,
+    db,
+    ref,
+    set,
+    get,
+    child,
+    onValue,
+    runTransaction,
+    remove
 };
 
-console.log("Quick Count OSIS: Firebase berhasil diinisialisasi.");
+console.log("Firebase Quick Count OSIS initialized.");
